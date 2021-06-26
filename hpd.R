@@ -2,7 +2,7 @@ hpd <- function(posterior, p=0.95){
 	unname(sort(posterior)) -> sp
 	round(length(sp)*p) -> n
 	ints <- vector()
-	for(i in 1:round(length(sp)*(1-p))){
+	for(i in 1:ceiling(length(sp)*(1-p))){
 		append(ints, sp[i+(n-1)]-sp[i]) -> ints
 		}
 	c(sp[which(ints == min(ints))], sp[which(ints == min(ints))+(n-1)]) -> ci
