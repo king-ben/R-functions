@@ -52,6 +52,7 @@ rate_links <- function(wp, cutoff=10){
   return(b)
 }
 
+# makes ancestral state reconstruction logger
 asr_blocks <- function(parts, names=NULL, links, logevery=1000, taxonset){
   logger <- newXMLNode("logger")
   xmlAttrs(logger) <- c(id="AncestralSequenceLogger", fileName="asr_logger.txt", logEvery=logevery, mode="tree")
@@ -69,6 +70,25 @@ asr_blocks <- function(parts, names=NULL, links, logevery=1000, taxonset){
     }
   }
   return(logger)
+}
+
+#calculates symonymy at ancestral state reconstruction node
+# input is the logger output by the beast analysis after it has had collapse_covarion.py run on it
+# asr logger is read in with fread
+asr_synonymy <- function(asr, wp, burnin=0.1, thinfactor=10){
+  b <- round(burnin*nrow(asr))
+  n <- nrow(asr)
+  nc <- ncol(asr)
+  asr <- asr[seq(b, n, by=thinfactor)]
+  n <- nrow(asr)
+  syn <- matrix(NA, nrow = n, ncol = nrow(wp))
+  for(i in 1:nrow(wp)){
+    for(j in 1:n){
+      t <- asr[j, wp[i,2]:wp[i,3]]
+      syn[j,i] <- sum(t)
+    }
+  }
+  return(syn)
 }
 
 
