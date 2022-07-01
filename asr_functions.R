@@ -43,6 +43,7 @@ find_site_names <- function(file){
 # binning is by default 1-10, 11-20 (excl ascertainment)
 rate_links <- function(wp, cutoff=10){
   n <- wp[,3]-wp[,2]
+  wp <- wp[order(n),]
   names(n) <- wp[,1]
   b <- wp[,1:2]
   for(i in 1:ceiling(max(n)/cutoff)){
