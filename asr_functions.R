@@ -44,6 +44,7 @@ find_site_names <- function(file){
 rate_links <- function(wp, cutoff=10){
   n <- wp[,3]-wp[,2]
   wp <- wp[order(n),]
+  n <- n[order(n)]
   names(n) <- wp[,1]
   b <- wp[,1:2]
   for(i in 1:ceiling(max(n)/cutoff)){
