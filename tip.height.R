@@ -10,3 +10,23 @@ tipHeights <- function(tree){
   }
   return(max-th)
 }
+
+node.height <- function(node, tree){
+  max(nodeHeights(tree)) - nodeheight(tree, node)
+}
+
+nodeheights <- function(tree){
+  edg <- match((tree$Nnode+2):(2*tree$Nnode+1), tree$edge[,1])
+  pt <- nodeHeights(tree)
+  ht <- pt[edg,1]
+  ht <- max(pt)-ht
+}
+
+cvh <- nodeheights(cv)
+msh <- nodeheights(ms)
+tar <- nodeheights(target)
+
+cv_er <- cvh-tar
+ms_er <- msh-tar
+
+plot(cv_er-ms_er, pch=20)

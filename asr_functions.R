@@ -27,16 +27,27 @@ find_partitions <- function(file){
 #makes a vector of character state labels read from nexus characterstatelabels block
 find_site_names <- function(file){
   nex <- readLines(file)
-  from <- grep("begin charstatelabels", nex, ignore.case=T)+1
-  if(length(from)==0){stop("characterstatelabels block not found")}
-  to <- which(nex=="end;")
-  to <- to[to>from][1]-1
-  cb <- nex[from:to]
-  cb <- gsub("    ", "", cb)
-  cb <- gsub(".*\\s", "", cb)
-  return(cb)
+  if(length(grep("begin data", nex, ignore.case = T))==0){
+    from <- grep("begin charstatelabels", nex, ignore.case=T)+1
+    if(length(from)==0){stop("characterstatelabels block not found")}
+    to <- which(nex=="end;")
+    to <- to[to>from][1]-1
+    cb <- nex[from:to]
+    cb <- gsub("    ", "", cb)
+    cb <- gsub(".*\\s", "", cb)
+    return(cb)
+  }else{
+    from <- grep("charstatelabels", nex, ignore.case=T)+1
+    if(length(from)==0){stop("characterstatelabels block not found")}
+    to <- which(nex==";")
+    to <- to[to>from][1]-1
+    cb <- nex[from:to]
+    cb <- gsub("    ", "", cb)
+    cb <- gsub(".*\\s", "", cb)
+    cb <- gsub(",", "", cb)
+    return(cb)
+  }
 }
-
 
 
 # Makes a table of rate parameter links
