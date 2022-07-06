@@ -54,6 +54,12 @@ rate_links <- function(wp, cutoff=10){
   return(b)
 }
 
+order_partitions <- function(wp){
+  n <- wp[,3]-wp[,2]
+  wp <- wp[order(n),]
+  return(wp)
+}
+
 # makes ancestral state reconstruction logger
 asr_blocks <- function(parts, names=NULL, links, logevery=1000, taxonset){
   logger <- newXMLNode("logger")
