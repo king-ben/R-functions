@@ -1,4 +1,4 @@
-#ALL FUNCTIONS ASSUME DIRST SITE IN EACH PARTITION IS AN ASCERTAINMENT COLUMN
+#ALL FUNCTIONS ASSUME FIRST SITE IN EACH PARTITION IS AN ASCERTAINMENT COLUMN
 
 # extracts partitions from a nexus file
 # reads the assumptions block and converts it to a 3-cloumn dataframe
@@ -72,26 +72,30 @@ order_partitions <- function(wp){
 }
 
 # makes ancestral state reconstruction logger
-asr_blocks <- function(parts, names=NULL, links, logevery=1000, taxonset){
+asr_blocks <- function(parts, names=NULL, links, logevery=1000, taxonset, logOrigin=FALSE, fileName="asr_logger.txt"){
   logger <- newXMLNode("logger")
-  xmlAttrs(logger) <- c(id="AncestralSequenceLogger", fileName="asr_logger.txt", logEvery=logevery, mode="tree")
+  xmlAttrs(logger) <- c(id="AncestralSequenceLogger", fileName=fileName, logEvery=logevery, mode="tree")
   for(i in 1:nrow(parts)){
     log <- newXMLNode("log", parent=logger)
     pnam <- parts[i,1]
     link <- links[which(links[,1]==pnam),2]
     first <- parts[i, 2]
     last <- parts[i, 3]
+    xmlAttrs(log) <- c(id=paste("ancestral", pnam, sep="."), spec="beast.evolution.likelihood.AncestralStateLogger", data=paste("@orgdata", pnam, sep="."), siteModel=paste("@SiteModel.s:", link, sep=""), branchRateModel="@RelaxedClock.c:clock", tree="@Tree.t:tree", taxonset=paste("@", taxonset, sep=""))
     if(is.null(names)){
-      xmlAttrs(log) <- c(id=paste("ancestral", pnam, sep="."), spec="beast.evolution.likelihood.AncestralStateLogger", data=paste("@orgdata", pnam, sep="."), siteModel=paste("@SiteModel.s:", link, sep=""), branchRateModel="@RelaxedClock.c:clock", tree="@Tree.t:tree", value=paste(paste0(pnam, ".ascertainment"), paste0(pnam, ".", 1:(last-first), collapse=" ")), taxonset=paste("@", taxonset, sep=""))
+      xmlAttrs(log) <- c(value=paste(paste0(pnam, ".ascertainment"), paste0(pnam, ".", 1:(last-first), collapse=" ")))
     } else{
       cnam <- names[first:last]
       xmlAttrs(log) <- c(id=paste("ancestral", pnam, sep="."), spec="beast.evolution.likelihood.AncestralStateLogger", data=paste("@orgdata", pnam, sep="."), siteModel=paste("@SiteModel.s:", link, sep=""), branchRateModel="@RelaxedClock.c:clock", tree="@Tree.t:tree", value=paste(cnam, collapse=" "), taxonset=paste("@", taxonset, sep=""))
+    }
+    if(logOrigin=TRUE){
+      xmlAttrs(log) <- c(logParent="true", logMRCA="false")
     }
   }
   return(logger)
 }
 
-#calculates symonymy at ancestral state reconstruction node
+#calculates synonymy at ancestral state reconstruction node
 # input is the logger output by the beast analysis after it has had collapse_covarion.py run on it
 # asr logger is read in with fread
 asr_synonymy <- function(asr, wp, burnin=0.1, thinfactor=10){
