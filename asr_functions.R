@@ -88,7 +88,7 @@ asr_blocks <- function(parts, names=NULL, links, logevery=1000, taxonset, logOri
       cnam <- names[first:last]
       xmlAttrs(log) <- c(id=paste("ancestral", pnam, sep="."), spec="beast.evolution.likelihood.AncestralStateLogger", data=paste("@orgdata", pnam, sep="."), siteModel=paste("@SiteModel.s:", link, sep=""), branchRateModel="@RelaxedClock.c:clock", tree="@Tree.t:tree", value=paste(cnam, collapse=" "), taxonset=paste("@", taxonset, sep=""))
     }
-    if(logOrigin=TRUE){
+    if(logOrigin==TRUE){
       xmlAttrs(log) <- c(logParent="true", logMRCA="false")
     }
   }
