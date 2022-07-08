@@ -22,11 +22,3 @@ nodeheights <- function(tree){
   ht <- max(pt)-ht
 }
 
-cvh <- nodeheights(cv)
-msh <- nodeheights(ms)
-tar <- nodeheights(target)
-
-cv_er <- cvh-tar
-ms_er <- msh-tar
-
-plot(cv_er-ms_er, pch=20)
