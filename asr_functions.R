@@ -27,7 +27,7 @@ find_partitions <- function(file){
 #makes a vector of character state labels read from nexus characterstatelabels block
 find_site_names <- function(file){
   nex <- readLines(file)
-  if(length(grep("begin data", nex, ignore.case = T))==0){
+  if(length(grep("begin charstatelabels", nex, ignore.case = T))>0){
     from <- grep("begin charstatelabels", nex, ignore.case=T)+1
     if(length(from)==0){stop("characterstatelabels block not found")}
     to <- which(nex=="end;")

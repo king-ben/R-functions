@@ -1,5 +1,7 @@
 #Returns the height of a taxon
 #requires phytools library
+library(phytools)
+
 tip.height <- function(tree, tip){return(max(nodeHeights(tree))-nodeheight(tree, which(tree$tip.label == tip)))}
 
 tipHeights <- function(tree){
