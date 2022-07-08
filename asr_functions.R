@@ -114,4 +114,22 @@ asr_synonymy <- function(asr, wp, burnin=0.1, thinfactor=10){
   return(syn)
 }
 
-
+#find changes on a branch. Takes asr from the nodes at either end of the branch
+get_innovations <- function(asr_mrca, asr_parent, burnin=0.1, siglevel=0.5, mode="innovations"){
+  b <- round(burnin*nrow(asr_mrca))
+  n <- nrow(asr_mrca)
+  asr_mrca <- asr_mrca[b:n,]
+  asr_parent <- asr_parent[b:n,]
+  
+  if(mode=="innovations"){
+    asr_comp <-ifelse(asr_parent==0 & asr_mrca==1, 1, 0)
+  }
+  if(mode=="losses"){
+    asr_comp <-ifelse(asr_parent==1 & asr_mrca==0, 1, 0)
+  }
+  
+  asr_mean <- apply(asr_comp, 2, mean)
+  sig <- asr_mean[asr_mean>siglevel]
+  sig <- sig[order(sig, decreasing=T)]
+  return(sig)
+}
