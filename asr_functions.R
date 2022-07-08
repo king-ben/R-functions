@@ -133,3 +133,33 @@ get_innovations <- function(asr_mrca, asr_parent, burnin=0.1, siglevel=0.5, mode
   sig <- sig[order(sig, decreasing=T)]
   return(sig)
 }
+
+# find innovations on terminal branches i.e. the data at the tips is known and fixed
+# takes a vector of tip states
+# MUST be in same order as asr file suggested code:
+# wn <- find_site_names("../make_asr_xml/ie.nex")
+# cognateorder <- match(names(asr_T), wn)
+# taxon_data <- nex[[taxon]]
+# taxon_data <- taxon_data[cognateorder]
+
+get_innovations_terminal <- function(taxon_data, asr_parent, burnin=0.1, siglevel=0.5, mode="innovations"){
+  b <- round(burnin*nrow(asr_parent))
+  n <- nrow(asr_parent)
+  asr_parent <- asr_parent[b:n,]
+  asr_parent <- as.data.frame(asr_parent)
+  
+  if(mode=="innovations"){
+    asr_parent_test <- asr_parent[,which(taxon_data==1)]
+    asr_comp <- 1-asr_parent_test
+  }
+  if(mode=="losses"){
+    asr_parent_test <- asr_parent[,which(taxon_data==0)]
+    asr_comp <- 1-asr_parent_test
+  }
+  
+  asr_mean <- apply(asr_comp, 2, mean)
+  sig <- asr_mean[asr_mean>siglevel]
+  sig <- sig[order(sig, decreasing=T)]
+  return(sig)
+}
+
