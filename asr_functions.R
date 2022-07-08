@@ -81,7 +81,7 @@ asr_blocks <- function(parts, names=NULL, links, id="AncestralSequenceLogger", l
     link <- links[which(links[,1]==pnam),2]
     first <- parts[i, 2]
     last <- parts[i, 3]
-    xmlAttrs(log) <- c(id=paste("ancestral", pnam, sep="."), spec="beast.evolution.likelihood.AncestralStateLogger", data=paste("@orgdata", pnam, sep="."), siteModel=paste("@SiteModel.s:", link, sep=""), branchRateModel="@RelaxedClock.c:clock", tree="@Tree.t:tree", taxonset=paste("@", taxonset, sep=""))
+    xmlAttrs(log) <- c(id=paste(id, pnam, sep="."), spec="beast.evolution.likelihood.AncestralStateLogger", data=paste("@orgdata", pnam, sep="."), siteModel=paste("@SiteModel.s:", link, sep=""), branchRateModel="@RelaxedClock.c:clock", tree="@Tree.t:tree", taxonset=paste("@", taxonset, sep=""))
     if(is.null(names)){
       xmlAttrs(log) <- c(value=paste(paste0(pnam, ".ascertainment"), paste0(pnam, ".", 1:(last-first), collapse=" ")))
     } else{
