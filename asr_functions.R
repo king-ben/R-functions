@@ -153,8 +153,7 @@ get_innovations_terminal <- function(taxon_data, asr_parent, burnin=0.1, sigleve
     asr_comp <- 1-asr_parent_test
   }
   if(mode=="losses"){
-    asr_parent_test <- asr_parent[,which(taxon_data==0)]
-    asr_comp <- 1-asr_parent_test
+    asr_comp <- asr_parent[,which(taxon_data==0)]
   }
   
   asr_mean <- apply(asr_comp, 2, mean)
