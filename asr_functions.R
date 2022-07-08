@@ -72,9 +72,9 @@ order_partitions <- function(wp){
 }
 
 # makes ancestral state reconstruction logger
-asr_blocks <- function(parts, names=NULL, links, logevery=1000, taxonset, logOrigin=FALSE, fileName="asr_logger.txt"){
+asr_blocks <- function(parts, names=NULL, links, id="AncestralSequenceLogger", logevery=1000, taxonset, logOrigin=FALSE, fileName="asr_logger.txt"){
   logger <- newXMLNode("logger")
-  xmlAttrs(logger) <- c(id="AncestralSequenceLogger", fileName=fileName, logEvery=logevery, mode="tree")
+  xmlAttrs(logger) <- c(id=id, fileName=fileName, logEvery=logevery, mode="tree")
   for(i in 1:nrow(parts)){
     log <- newXMLNode("log", parent=logger)
     pnam <- parts[i,1]
