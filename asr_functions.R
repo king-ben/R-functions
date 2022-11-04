@@ -71,6 +71,22 @@ order_partitions <- function(wp){
   return(wp)
 }
 
+#orders the partitions in increasing size
+order_nexus_partitions <- function(file){
+  wp <- find_partitions(file)
+  nex <- readLines(file)
+  from <- grep("begin assumptions", nex, ignore.case=T)+1
+  from <- from[grep("charset", nex[from])]
+  if(length(from)==0){stop("assumptions block with character sets not found")}
+  to <- which(nex=="end;")
+  to <- to[to>from][1]-1
+  partitions_ordered <- order_partitions(wp)
+  nex[from:to] <- paste0("\t", "charset ", partitions_ordered$concept, " = ", partitions_ordered$from, "-", partitions_ordered$to, ";")
+  output <- sub(".nex", "_sorted.nex", file)
+  writeLines(nex, output)
+}
+
+
 #makes logger of likelihood of every cognate set
 siteprobs_blocks <- function(parts, names, logevery=1000){
   logger <- newXMLNode("logger")
@@ -80,7 +96,7 @@ siteprobs_blocks <- function(parts, names, logevery=1000){
     pnam <- parts[i,1]
     first <- parts[i, 2]
     last <- parts[i, 3]
-    cnam <- names[first:last, 2]
+    cnam <- names[first:last]
     
     xmlAttrs(log) <- c(id=paste("sitelik", pnam, sep="."), spec="babel.util.SiteLikelihoodLogger", likelihood=paste("@treeLikelihood", pnam, sep="."), value=paste(cnam, collapse=" "))
   }
