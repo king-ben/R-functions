@@ -71,6 +71,22 @@ order_partitions <- function(wp){
   return(wp)
 }
 
+#makes logger of likelihood of every cognate set
+siteprobs_blocks <- function(parts, names, logevery=1000){
+  logger <- newXMLNode("logger")
+  xmlAttrs(logger) <- c(id="Sitelikelihoods", fileName="site_likelihoods.txt", logEvery=logevery, mode="tree")
+  for(i in 1:nrow(parts)){
+    log <- newXMLNode("log", parent=logger)
+    pnam <- parts[i,1]
+    first <- parts[i, 2]
+    last <- parts[i, 3]
+    cnam <- names[first:last, 2]
+    
+    xmlAttrs(log) <- c(id=paste("sitelik", pnam, sep="."), spec="babel.util.SiteLikelihoodLogger", likelihood=paste("@treeLikelihood", pnam, sep="."), value=paste(cnam, collapse=" "))
+  }
+  return(logger)
+}
+
 # makes ancestral state reconstruction logger
 asr_blocks <- function(parts, names=NULL, links, id="AncestralSequenceLogger", logevery=1000, taxonset, logOrigin=FALSE, fileName="asr_logger.txt"){
   logger <- newXMLNode("logger")
