@@ -103,6 +103,70 @@ siteprobs_blocks <- function(parts, names, logevery=1000){
   return(logger)
 }
 
+#compares site logger of 2 analyses and returns a table of significantly different cognates and a plot
+topology_test <- function(sample1, sample2, label1="topology1", label2="topology2", burnin=0.1){
+  require(ggplot2)
+  require(ggthemes)
+  require(data.table)
+  sitelik1 <- fread(sample1)
+  sitelik2 <- fread(sample2)
+  class(sitelik1) <- "data.frame"
+  class(sitelik2) <- "data.frame"
+  ascertained <- which(grepl("ascertainment", colnames(sitelik1)))
+  sitelik1 <- sitelik1[round(burnin*nrow(sitelik1)):nrow(sitelik1), setdiff(1:ncol(sitelik1), ascertained)]
+  sitelik2 <- sitelik2[round(burnin*nrow(sitelik2)):nrow(sitelik2), setdiff(1:ncol(sitelik2), ascertained)]
+  hpd1 <- t(apply(sitelik1, 2, hpd))
+  hpd2 <- t(apply(sitelik2, 2, hpd))
+  median1 <- as.matrix(apply(sitelik1, 2, median))
+  median2 <- as.matrix(apply(sitelik2, 2, median))
+  results1 <- cbind(rownames(hpd1), median1, hpd1, label1)
+  results2 <- cbind(rownames(hpd2), median2, hpd2, label2)
+  support <- vector()
+  for(i in 1:nrow(results1)){
+    support[i] <- NA
+    if(hpd1[i,1] > hpd2[i,2]){
+      support[i] <- label1
+    }
+    if(hpd2[i,1] > hpd1[i,2]){
+      support[i] <- label2
+    }
+  }
+  results1 <- cbind(results1, support)
+  results2 <- cbind(results2, support)
+  results1 <- results1[which(is.na(support)==F),]
+  results2 <- results2[which(is.na(support)==F),]
+  results <- rbind(results1, results2)
+  colnames(results) <- c("cognate", "median", "lower", "upper", "topology", "support")
+  results <- transform(results, median=as.numeric(median),
+                       lower=as.numeric(lower),
+                       upper=as.numeric(upper))
+  results[2:4] <- results[2:4]-results$median[1:(0.5*nrow(results))]
+  results$cognate <- factor(results$cognate,
+                            levels = results[,1][order(results$median[(0.5*nrow(results)+1):nrow(results)], decreasing=T)])
+  results$support <- factor(results$support, levels=c(label1, label2))
+  p <- ggplot(results, aes(x=cognate,
+                           y=median,
+                           color=topology)) +
+    scale_color_manual(values=c("#d0968f", "#043fc9")) +
+    geom_point() +
+    geom_errorbar(aes(ymin=lower,
+                      ymax=upper)) +
+    facet_grid(support~., space="free_y", scales="free_y") +
+    theme_hc() +
+    theme(axis.text.x = 
+            element_text(angle = 90, 
+                         vjust = 0.5, hjust=1), 
+          legend.position="top", 
+          #strip.text = element_text(size=12)
+    ) +
+    ylab("relative log likelihood") +
+    coord_flip()
+  
+  out <- list(significant_cognates=results, plot=p)
+}
+
+
+
 # makes ancestral state reconstruction logger
 asr_blocks <- function(parts, names=NULL, links, id="AncestralSequenceLogger", logevery=1000, taxonset, logOrigin=FALSE, fileName="asr_logger.txt"){
   logger <- newXMLNode("logger")
