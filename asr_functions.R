@@ -104,7 +104,7 @@ siteprobs_blocks <- function(parts, names, logevery=1000){
 }
 
 #compares site logger of 2 analyses and returns a table of significantly different cognates and a plot
-topology_test <- function(sample1, sample2, label1="topology1", label2="topology2", burnin=0.1){
+topology_test <- function(sample1, sample2, label1="topology1", label2="topology2", burnin=0.1, hpd.level=0.95, colors=c("#d0968f", "#043fc9")){
   require(ggplot2)
   require(ggthemes)
   require(data.table)
@@ -115,8 +115,8 @@ topology_test <- function(sample1, sample2, label1="topology1", label2="topology
   ascertained <- which(grepl("ascertainment", colnames(sitelik1)))
   sitelik1 <- sitelik1[round(burnin*nrow(sitelik1)):nrow(sitelik1), setdiff(1:ncol(sitelik1), ascertained)]
   sitelik2 <- sitelik2[round(burnin*nrow(sitelik2)):nrow(sitelik2), setdiff(1:ncol(sitelik2), ascertained)]
-  hpd1 <- t(apply(sitelik1, 2, hpd))
-  hpd2 <- t(apply(sitelik2, 2, hpd))
+  hpd1 <- t(apply(sitelik1, 2, hpd, p=hpd.level))
+  hpd2 <- t(apply(sitelik2, 2, hpd, p=hpd.level))
   median1 <- as.matrix(apply(sitelik1, 2, median))
   median2 <- as.matrix(apply(sitelik2, 2, median))
   results1 <- cbind(rownames(hpd1), median1, hpd1, label1)
@@ -147,7 +147,7 @@ topology_test <- function(sample1, sample2, label1="topology1", label2="topology
   p <- ggplot(results, aes(x=cognate,
                            y=median,
                            color=topology)) +
-    scale_color_manual(values=c("#d0968f", "#043fc9")) +
+    scale_color_manual(values=colors) +
     geom_point() +
     geom_errorbar(aes(ymin=lower,
                       ymax=upper)) +
